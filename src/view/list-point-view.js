@@ -37,8 +37,7 @@ const createEventsPointTemplate = () => (
         <span class="visually-hidden">Open event</span>
       </button>
     </div>
-  </li>
-  </ul>`
+  </li>`
 );
 
 export default class EventsPoint {
