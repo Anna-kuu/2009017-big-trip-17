@@ -10,9 +10,14 @@ const getRandomInteger = (a = 0, b = 1) => {
 const humanizePointEventDate = (date) => dayjs(date).format('MMM D');
 const humanizePointTime = (date) => dayjs(date).format('HH-mm');
 
-const humanizeEventStartTime = (date) => dayjs(date).format('DD/MM/YYYY HH-mm');
-const humanizeEventEndTime = (date) => dayjs(date).format('DD/MM/YYYY HH-mm');
+const humanizeEventTime = (date) => dayjs(date).format('DD/MM/YYYY HH-mm');
 
+const durationTime = (dateFrom, dateTo) => {
+  const start = dayjs(dateFrom);
+  const end = dayjs(dateTo);
+  const time = end.diff(start, 'minutes');
+};
+durationTime ('2019-07-10T08:45:56.845Z', '2019-07-10T13:45:56.375Z');
 
 const humanizePointDuration = (dateFrom, dateTo) => {
   const minutesFrom = Math.floor(dayjs(dateFrom).format('mm')) + Math.floor(dayjs(dateFrom).format('HH')*60);
@@ -26,4 +31,4 @@ const humanizePointDuration = (dateFrom, dateTo) => {
   return `${(`00${minutesDuration}`).slice(-2) }M`;
 };
 
-export {getRandomInteger, humanizePointEventDate, humanizePointTime, humanizePointDuration, humanizeEventStartTime, humanizeEventEndTime};
+export {getRandomInteger, humanizePointEventDate, humanizePointTime, humanizePointDuration, humanizeEventTime};

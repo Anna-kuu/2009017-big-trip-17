@@ -3,10 +3,10 @@ import { humanizePointEventDate } from '../utils.js';
 import { humanizePointTime } from '../utils.js';
 import { humanizePointDuration } from '../utils.js';
 
-const createEventsPointTemplate = (point, allOffers) => {
-  const {basePrice, type, dateFrom, dateTo, isFavorite, offers} = point;
+const createEventsTemplate = (point, allOffers) => {
+  const {basePrice, type, dateFrom, dateTo, isFavorite, offers, destination} = point;
 
-  let offerTemplate = `<ul class="event__selected-offers">`;
+  let offerTemplate = '<ul class="event__selected-offers">';
 
   offers.forEach((offerId) => {
     const offerObject = allOffers.find((element) => element.id === offerId);
@@ -16,7 +16,7 @@ const createEventsPointTemplate = (point, allOffers) => {
     <span class="event__offer-price">${offerObject.price}</span>
   </li>`;
   });
-  offerTemplate += `</ul>`;
+  offerTemplate += '</ul>';
 
   const eventDate = humanizePointEventDate(dateFrom);
   const startTime = humanizePointTime(dateFrom);
@@ -34,7 +34,7 @@ const createEventsPointTemplate = (point, allOffers) => {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type.charAt(0).toUpperCase() + type.slice(1)} Amsterdam</h3>
+      <h3 class="event__title">${type.charAt(0).toUpperCase() + type.slice(1)} ${destination}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="2019-03-18T10:30">${startTime}</time>
@@ -68,7 +68,7 @@ export default class EventsPoint {
   }
 
   getTemplate() {
-    return createEventsPointTemplate(this.point, this.offers);
+    return createEventsTemplate(this.point, this.offers);
   }
 
   getElement() {

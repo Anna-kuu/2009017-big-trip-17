@@ -1,5 +1,5 @@
 import {createElement} from '../render.js';
-import { humanizeEventStartTime, humanizeEventEndTime } from '../utils.js';
+import { humanizeEventTime} from '../utils.js';
 import { TYPES } from '../const.js';
 
 const createEventsTypeContainer = (currentType) => TYPES.map((type) =>
@@ -7,7 +7,7 @@ const createEventsTypeContainer = (currentType) => TYPES.map((type) =>
     <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}"${currentType === type ? 'checked' : ''}>
     <label class="event__type-label  event__type-label--${type}" for="event-type-t${type}-1">${type}</label>
   </div>`
-);
+).join('');
 
 const createEventsOffersContainer = (allOffers) => {
   let eventOffers = '';
@@ -27,8 +27,8 @@ const createEventsOffersContainer = (allOffers) => {
 const createEditPointTemplate = (point, allOffers) => {
   const {basePrice, type, dateFrom, dateTo} = point;
 
-  const eventStartTime = humanizeEventStartTime(dateFrom);
-  const eventEndTime = humanizeEventEndTime(dateTo);
+  const eventStartTime = humanizeEventTime(dateFrom);
+  const eventEndTime = humanizeEventTime(dateTo);
 
 
   return (
@@ -55,7 +55,7 @@ const createEditPointTemplate = (point, allOffers) => {
                     <label class="event__label  event__type-output" for="event-destination-1">
                     ${type.charAt(0).toUpperCase() + type.slice(1)}
                     </label>
-                    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="e vent-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
                     <datalist id="destination-list-1">
                       <option value="Amsterdam"></option>
                       <option value="Geneva"></option>

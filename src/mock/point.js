@@ -1,11 +1,12 @@
-import { TYPES } from '../const.js';
+import { TYPES, DATE_FROM, DATE_TO, PRICE, DESTINATION, OFFERS_CHOOSE } from '../const.js';
 import { getRandomInteger } from '../utils.js';
 
-const getRandomType = () => {
-  const randomIndex = getRandomInteger(0, TYPES.length - 1);
-
-  return TYPES[randomIndex];
-};
+const getRandomType = () => TYPES[getRandomInteger(0, TYPES.length - 1)];
+const getRandomDateFrom = () => DATE_FROM[getRandomInteger(0, DATE_FROM.length - 1)];
+const getRandomDateTo = () => DATE_TO[getRandomInteger(0, DATE_TO.length -1)];
+const getPrice = () => PRICE[getRandomInteger(0, PRICE.length - 1)];
+const getRandomDestination = () => DESTINATION[getRandomInteger(0, DESTINATION.length - 1)];
+const getRandomOffers = () => OFFERS_CHOOSE[getRandomInteger(0, OFFERS_CHOOSE.length - 1)];
 
 export const generateOffer = () => ({
   type: 'taxi',
@@ -18,16 +19,28 @@ export const generateOffer = () => ({
       id: 2,
       title: 'Choose the radio station',
       price: 60
+    }, {
+      id: 3,
+      title: 'Order Uber',
+      price: 20
+    }, {
+      id: 4,
+      title: 'Rent a car ',
+      price: 200
+    }, {
+      id: 5,
+      title: 'Add breakfast',
+      price: 50
     }
   ]
 });
 
 export const generatePoint = () => ({
-  basePrice: 35,
-  dateFrom: '2019-07-10T10:45:56.845Z',
-  dateTo: '2019-07-11T11:45:56.375Z',
-  //destination: $Destination$,
+  basePrice: getPrice(),
+  dateFrom: getRandomDateFrom(),
+  dateTo: getRandomDateTo(),
+  destination: getRandomDestination(),
   isFavorite: Boolean(getRandomInteger(0, 1)),
-  offers: [1],
+  offers: getRandomOffers(),
   type: getRandomType(),
 });
