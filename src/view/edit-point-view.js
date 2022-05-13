@@ -9,11 +9,12 @@ const createEventsTypeContainer = (currentType) => TYPES.map((type) =>
   </div>`
 ).join('');
 
-const createEventsOffersContainer = (allOffers) => {
+const createEventsOffersContainer = (point, allOffers) => {
   let eventOffers = '';
-  allOffers.forEach((offer) => {
+  allOffers.map((offer) => {
+    const checked = point.offers.includes(offer.id) ? 'checked' : '';
     eventOffers += `<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
+    <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${checked}>
     <label class="event__offer-label" for="event-offer-luggage-1">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
@@ -29,7 +30,6 @@ const createEditPointTemplate = (point, allOffers) => {
 
   const eventStartTime = humanizeEventTime(dateFrom);
   const eventEndTime = humanizeEventTime(dateTo);
-
 
   return (
     `<li class="trip-events__item">
@@ -90,7 +90,7 @@ const createEditPointTemplate = (point, allOffers) => {
                     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
                     <div class="event__available-offers">
-                    ${createEventsOffersContainer(allOffers)}
+                    ${createEventsOffersContainer(point, allOffers)}
                       <div class="event__offer-selector">
                         <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" checked>
                         <label class="event__offer-label" for="event-offer-luggage-1">
