@@ -10,8 +10,9 @@ const createEventsTypeContainer = (currentType) => TYPES.map((type) =>
 ).join('');
 
 const createEventsOffersContainer = (point, allOffers) => {
+  const pointTypeOffer = allOffers.find((offer) => offer.type === point.type);
   let eventOffers = '';
-  allOffers.map((offer) => {
+  pointTypeOffer.offers.map((offer) => {
     const checked = point.offers.includes(offer.id) ? 'checked' : '';
     eventOffers += `<div class="event__offer-selector">
     <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${checked}>
@@ -149,24 +150,28 @@ const createEditPointTemplate = (point, allOffers) => {
 };
 
 export default class EditPoint {
+  #element = null;
+  #point = null;
+  #offers = null;
+
   constructor(point, offers) {
-    this.point = point;
-    this.offers = offers;
+    this.#point = point;
+    this.#offers = offers;
   }
 
-  getTemplate() {
-    return createEditPointTemplate(this.point, this.offers);
+  get template() {
+    return createEditPointTemplate(this.#point, this.#offers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

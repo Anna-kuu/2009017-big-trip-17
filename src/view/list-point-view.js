@@ -5,11 +5,14 @@ import { humanizePointDuration } from '../utils.js';
 
 const createEventsTemplate = (point, allOffers) => {
   const {basePrice, type, dateFrom, dateTo, isFavorite, offers, destination} = point;
+  const pointTypeOffer = allOffers.find((offer) => offer.type === type);
 
   let offerTemplate = '<ul class="event__selected-offers">';
 
   offers.forEach((offerId) => {
-    const offerObject = allOffers.find((element) => element.id === offerId);
+    const offerObject = pointTypeOffer.offers.find((element) => element.id === offerId);
+    console.log(offerObject);
+
     offerTemplate += `<li class="event__offer">
     <span class="event__offer-title">${offerObject.title}</span>
     &plus;&euro;&nbsp;
@@ -62,24 +65,28 @@ const createEventsTemplate = (point, allOffers) => {
 };
 
 export default class EventsPoint {
+  #element = null;
+  #point = null;
+  #offers = null;
+
   constructor(point, offers) {
-    this.point = point;
-    this.offers = offers;
+    this.#point = point;
+    this.#offers = offers;
   }
 
-  getTemplate() {
-    return createEventsTemplate(this.point, this.offers);
+  get template() {
+    return createEventsTemplate(this.#point, this.#offers);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }

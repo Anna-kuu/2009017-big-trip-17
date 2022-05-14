@@ -8,7 +8,7 @@ const getPrice = () => PRICE[getRandomInteger(0, PRICE.length - 1)];
 const getRandomDestination = () => DESTINATION[getRandomInteger(0, DESTINATION.length - 1)];
 const getRandomOffers = () => OFFERS_CHOOSE[getRandomInteger(0, OFFERS_CHOOSE.length - 1)];
 
-export const generateOffer = () => ({
+export const generateOffer = () => [{
   type: 'taxi',
   offers: [
     {
@@ -33,7 +33,29 @@ export const generateOffer = () => ({
       price: 50
     }
   ]
-});
+},{
+  type: 'flight',
+  offers: [
+    {
+      id: 1,
+      title: 'Upgrade to a business class',
+      price: 120
+    }, {
+      id: 2,
+      title: 'Choose the radio station',
+      price: 60
+    }, {
+      id: 3,
+      title: 'Order Uber',
+      price: 20
+    }, {
+      id: 4,
+      title: 'Rent a car ',
+      price: 200
+    }
+  ]
+}
+];
 
 export const generatePoint = () => ({
   basePrice: getPrice(),
