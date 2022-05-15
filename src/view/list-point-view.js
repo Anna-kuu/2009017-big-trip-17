@@ -11,13 +11,12 @@ const createEventsTemplate = (point, allOffers) => {
 
   offers.forEach((offerId) => {
     const offerObject = pointTypeOffer.offers.find((element) => element.id === offerId);
-    console.log(offerObject);
 
     offerTemplate += `<li class="event__offer">
     <span class="event__offer-title">${offerObject.title}</span>
     &plus;&euro;&nbsp;
     <span class="event__offer-price">${offerObject.price}</span>
-  </li>`;
+    </li>`;
   });
   offerTemplate += '</ul>';
 

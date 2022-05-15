@@ -26,8 +26,12 @@ const createEventsOffersContainer = (point, allOffers) => {
   return eventOffers;
 };
 
-const createEditPointTemplate = (point, allOffers) => {
-  const {basePrice, type, dateFrom, dateTo} = point;
+const createEditPointTemplate = (point = {}, allOffers = []) => {
+  const {basePrice = 1100,
+    dateFrom = '2019-07-10T22:55:56.845Z',
+    dateTo= '2019-07-11T11:22:13.375Z',
+    type = 'taxi',
+  } = point;
 
   const eventStartTime = humanizeEventTime(dateFrom);
   const eventEndTime = humanizeEventTime(dateTo);

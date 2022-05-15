@@ -1,4 +1,3 @@
-//import NewPoint from '../view/add-new-point-view.js';
 import SortView from '../view/sort-view.js';
 import EditPoint from '../view/edit-point-view.js';
 import EventsPoint from '../view/list-point-view.js';
@@ -21,8 +20,6 @@ export default class BoardPresenter {
 
     render(new SortView(), this.#boardContainer);
     render(this.#tripListView, this.#boardContainer);
-    //render(new EditPoint(this.#boardPoints[0], this.#boardOffers[0]), this.#tripListView.element);
-    //render(new NewPoint(), this.tripListView.getElement());
 
     for (let i = 0; i < this.#boardPoints.length; i++) {
       this.#renderPoint(this.#boardPoints[i], this.#boardOffers[0]);
@@ -31,6 +28,39 @@ export default class BoardPresenter {
 
   #renderPoint = (point, offers) => {
     const pointComponent = new EventsPoint(point, offers);
+    const pointEditComponent = new EditPoint(point, offers);
+
+    const replacePointToForm = () => {
+      this.#tripListView.element.replaceChild(pointEditComponent.element, pointComponent.element);
+    };
+
+    const replaceFormToPoint = () => {
+      this.#tripListView.element.replaceChild(pointComponent.element, pointEditComponent.element);
+    };
+
+    const onEscKeyDown = (evt) => {
+      if (evt.key === 'Escape' || evt.key === 'Esc') {
+        evt.preventDefault();
+        replaceFormToPoint();
+        document.removeEventListener('keydown', onEscKeyDown);
+      }
+    };
+
+    pointComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      replacePointToForm();
+      document.addEventListener('keydown', onEscKeyDown);
+    });
+
+    pointEditComponent.element.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      replaceFormToPoint();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
+
+    pointEditComponent.element.querySelector('form').addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      replaceFormToPoint();
+      document.removeEventListener('keydown', onEscKeyDown);
+    });
 
     render (pointComponent, this.#tripListView.element);
   };
