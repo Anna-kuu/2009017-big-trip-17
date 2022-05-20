@@ -76,4 +76,14 @@ export default class EventsPoint extends AbstractView {
   get template() {
     return createEventsTemplate(this.#point, this.#offers);
   }
+
+  setEditClickHandler = (callback) => {
+    this._callback.editClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formEditClickHandler);
+  };
+
+  #formEditClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.editClick();
+  };
 }
