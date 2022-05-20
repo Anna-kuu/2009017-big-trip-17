@@ -1,6 +1,14 @@
-import {createElement} from '../render.js';
+import AbstractView from '../framework/view/abstract-view.js';
 import { humanizeEventTime} from '../utils.js';
 import { TYPES } from '../const.js';
+
+const BLANC_POINT = {
+  basePrice: '',
+  dateFrom: '2019-07-10T22:55:56.845Z',
+  dateTo: '2019-07-11T11:22:13.375Z',
+  destination: 'Geneva',
+  type: 'taxi',
+};
 
 const createEventsTypeContainer = (currentType) => TYPES.map((type) =>
   `<div class="event__type-item">
@@ -26,10 +34,11 @@ const createEventsOffersContainer = (point, allOffers) => {
   return eventOffers;
 };
 
-const createEditPointTemplate = (point = {}, allOffers = []) => {
-  const {basePrice = 1100,
+const createEditPointTemplate = (point = {}, allOffers) => {
+  const {basePrice = '',
     dateFrom = '2019-07-10T22:55:56.845Z',
-    dateTo= '2019-07-11T11:22:13.375Z',
+    dateTo = '2019-07-11T11:22:13.375Z',
+    destination = '',
     type = 'taxi',
   } = point;
 
@@ -60,7 +69,7 @@ const createEditPointTemplate = (point = {}, allOffers = []) => {
                     <label class="event__label  event__type-output" for="event-destination-1">
                     ${type.charAt(0).toUpperCase() + type.slice(1)}
                     </label>
-                    <input class="event__input  event__input--destination" id="e vent-destination-1" type="text" name="event-destination" value="Chamonix" list="destination-list-1">
+                    <input class="event__input  event__input--destination" id="e vent-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
                     <datalist id="destination-list-1">
                       <option value="Amsterdam"></option>
                       <option value="Geneva"></option>
@@ -153,29 +162,17 @@ const createEditPointTemplate = (point = {}, allOffers = []) => {
   );
 };
 
-export default class EditPoint {
-  #element = null;
+export default class EditPoint extends AbstractView {
   #point = null;
   #offers = null;
 
-  constructor(point, offers) {
+  constructor(point = BLANC_POINT, offers) {
+    super();
     this.#point = point;
     this.#offers = offers;
   }
 
   get template() {
     return createEditPointTemplate(this.#point, this.#offers);
-  }
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
