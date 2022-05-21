@@ -1,7 +1,5 @@
-import {createElement} from '../render.js';
-import { humanizePointEventDate } from '../utils.js';
-import { humanizePointTime } from '../utils.js';
-import { humanizePointDuration } from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+import { humanizePointEventDate, humanizePointTime, humanizePointDuration } from '../utils/point.js';
 
 const createEventsTemplate = (point, allOffers) => {
   const {basePrice, type, dateFrom, dateTo, isFavorite, offers, destination} = point;
@@ -63,12 +61,12 @@ const createEventsTemplate = (point, allOffers) => {
   </li>`);
 };
 
-export default class EventsPoint {
-  #element = null;
+export default class EventsPoint extends AbstractView {
   #point = null;
   #offers = null;
 
   constructor(point, offers) {
+    super();
     this.#point = point;
     this.#offers = offers;
   }
@@ -77,15 +75,13 @@ export default class EventsPoint {
     return createEventsTemplate(this.#point, this.#offers);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setEditClickHandler = (callback) => {
+    this._callback.editClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formEditClickHandler);
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #formEditClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.editClick();
+  };
 }
