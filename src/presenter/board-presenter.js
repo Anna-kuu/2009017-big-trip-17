@@ -3,7 +3,7 @@ import EditPoint from '../view/edit-point-view.js';
 import EventsPoint from '../view/list-point-view.js';
 import TripListView from '../view/list-container-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
-import {render, replace, remove} from '../framework/render.js';
+import {render, replace} from '../framework/render.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
