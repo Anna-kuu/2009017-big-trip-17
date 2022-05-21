@@ -1,5 +1,5 @@
 import { TYPES, DATE_FROM, DATE_TO, PRICE, DESTINATION, OFFERS_CHOOSE } from '../const.js';
-import { getRandomInteger } from '../utils.js';
+import { getRandomInteger } from '../utils/common.js';
 
 const getRandomType = () => TYPES[getRandomInteger(0, TYPES.length - 1)];
 const getRandomDateFrom = () => DATE_FROM[getRandomInteger(0, DATE_FROM.length - 1)];

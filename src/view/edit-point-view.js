@@ -1,5 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { humanizeEventTime} from '../utils.js';
+import {humanizeEventTime} from '../utils/point.js';
 import { TYPES } from '../const.js';
 
 const BLANC_POINT = {

@@ -1,7 +1,5 @@
 import AbstractView from '../framework/view/abstract-view.js';
-import { humanizePointEventDate } from '../utils.js';
-import { humanizePointTime } from '../utils.js';
-import { humanizePointDuration } from '../utils.js';
+import { humanizePointEventDate, humanizePointTime, humanizePointDuration } from '../utils/point.js';
 
 const createEventsTemplate = (point, allOffers) => {
   const {basePrice, type, dateFrom, dateTo, isFavorite, offers, destination} = point;
