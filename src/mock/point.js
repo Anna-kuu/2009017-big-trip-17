@@ -1,5 +1,6 @@
 import { TYPES, DATE_FROM, DATE_TO, PRICE, DESTINATION, OFFERS_CHOOSE } from '../const.js';
 import { getRandomInteger } from '../utils/common.js';
+import {nanoid} from 'nanoid';
 
 const getRandomType = () => TYPES[getRandomInteger(0, TYPES.length - 1)];
 const getRandomDateFrom = () => DATE_FROM[getRandomInteger(0, DATE_FROM.length - 1)];
@@ -58,6 +59,7 @@ export const generateOffer = () => [{
 ];
 
 export const generatePoint = () => ({
+  id: nanoid(),
   basePrice: getPrice(),
   dateFrom: getRandomDateFrom(),
   dateTo: getRandomDateTo(),
