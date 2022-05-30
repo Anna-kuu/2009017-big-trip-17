@@ -14,7 +14,7 @@ export const generateOffer = () => [{
   offers: [
     {
       id: 1,
-      title: 'Upgrade to a business class',
+      title: 'Choose class',
       price: 120
     }, {
       id: 2,
@@ -28,10 +28,6 @@ export const generateOffer = () => [{
       id: 4,
       title: 'Rent a car ',
       price: 200
-    }, {
-      id: 5,
-      title: 'Add breakfast',
-      price: 50
     }
   ]
 },{
@@ -39,19 +35,19 @@ export const generateOffer = () => [{
   offers: [
     {
       id: 1,
-      title: 'Upgrade to a business class',
-      price: 120
+      title: 'Add luggage',
+      price: 50
     }, {
       id: 2,
-      title: 'Choose the radio station',
-      price: 60
+      title: 'Add meal',
+      price: 15
     }, {
       id: 3,
-      title: 'Order Uber',
+      title: 'Choose seats',
       price: 20
     }, {
       id: 4,
-      title: 'Rent a car ',
+      title: 'Upgrade to a business class',
       price: 200
     }
   ]

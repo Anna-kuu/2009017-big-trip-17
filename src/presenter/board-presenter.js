@@ -8,6 +8,7 @@ import {updateItem} from '../utils/common.js';
 export default class BoardPresenter {
   #boardContainer = null;
   #pointsModel = null;
+  #allDestinations = null;
   #tripListComponent = new TripListView();
   #sortComponent = new SortView();
   #listEmptyComponent = new ListEmptyView();
@@ -15,9 +16,10 @@ export default class BoardPresenter {
   #boardOffers = [];
   #pointPresenter = new Map();
 
-  constructor(boardContainer, pointsModel) {
+  constructor(boardContainer, pointsModel, allDestinations) {
     this.#boardContainer = boardContainer;
     this.#pointsModel = pointsModel;
+    this.#allDestinations = allDestinations;
   }
 
   init = () => {
@@ -42,7 +44,7 @@ export default class BoardPresenter {
   #renderTripList = () => {
     render(this.#tripListComponent, this.#boardContainer);
     for (let i = 0; i < this.#boardPoints.length; i++) {
-      this.#renderPoint(this.#boardPoints[i], this.#boardOffers[0]);
+      this.#renderPoint(this.#boardPoints[i], this.#boardOffers[0], this.#allDestinations);
     }
   };
 
@@ -59,9 +61,9 @@ export default class BoardPresenter {
     }
   };
 
-  #renderPoint = (point, offers) => {
+  #renderPoint = (point, allOffers, allDestinations) => {
     const pointPresenter = new PointPresenter(this.#tripListComponent.element, this.#handlePointChange, this.#handleModeChange);
-    pointPresenter.init(point, offers);
+    pointPresenter.init(point, allOffers, allDestinations);
     this.#pointPresenter.set(point.id, pointPresenter);
   };
 
