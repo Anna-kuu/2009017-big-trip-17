@@ -187,14 +187,14 @@ export default class EditPoint extends AbstractStatefulView {
 
   #checkedTypeToggleHandler = (evt) => {
     evt.preventDefault();
-    const newType = evt.target.parentNode.querySelector('.event__type-input').value
+    const newType = evt.target.parentNode.querySelector('.event__type-input').value;
     this.updateElement({
       checkedType: newType,
       offers: [],
     });
   };
 
-/*
+  /*
   #offersToggleHandler = (evt) => {
     evt.preventDefault();
     console.log(this._state.offers.includes(getNumberFromString( evt.target.id )));
