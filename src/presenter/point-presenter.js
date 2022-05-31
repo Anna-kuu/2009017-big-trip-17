@@ -38,8 +38,8 @@ export default class PointPresenter {
     this.#pointEditComponent = new EditPoint(point, offers, destinations);
 
     this.#pointComponent.setEditClickHandler(this.#handleEditClick);
-    this.#pointEditComponent.setCloseFormClickHandler(this.#handleFormSubmit);
-    this.#pointEditComponent.setFormSubmitHandler(this.#handleCloseFormClick);
+    this.#pointEditComponent.setCloseFormClickHandler(this.#handleCloseFormClick);
+    this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -96,7 +96,8 @@ export default class PointPresenter {
     this.#replacePointToForm();
   };
 
-  #handleFormSubmit = () => {
+  #handleFormSubmit = (point) => {
+    this.#changeData(point);
     this.#replaceFormToPoint();
   };
 

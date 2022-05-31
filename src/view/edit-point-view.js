@@ -17,14 +17,14 @@ const createEventsTypeContainer = (currentType) => TYPES.map((type) =>
   </div>`
 ).join('');
 
-const createEventsOffersContainer = (point, allOffers) => {
-  const pointTypeOffer = allOffers.find((offer) => offer.type === point.checkedType);
+const createEventsOffersContainer = (checkedType, checkedOffers, allOffers) => {
+  const pointTypeOffer = allOffers.find((offer) => offer.type === checkedType);
   let eventOffers = '';
   pointTypeOffer.offers.map((offer) => {
-    const checked = point.offers.includes(offer.id) ? 'checked' : '';
+    const checked = checkedOffers.includes(offer.id) ? 'checked' : '';
     eventOffers += `<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="event-offer-luggage-1" type="checkbox" name="event-offer-luggage" ${checked}>
-    <label class="event__offer-label" for="event-offer-luggage-1">
+    <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage" ${checked}>
+    <label class="event__offer-label" for="${offer.id}">
       <span class="event__offer-title">${offer.title}</span>
       &plus;&euro;&nbsp;
       <span class="event__offer-price">${offer.price}</span>
@@ -65,7 +65,7 @@ const createDestinationTemplate = (allDestinations, checkedDestination) => {
 };
 
 const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
-  const {basePrice, dateFrom, dateTo, checkedDestination, checkedType} = point;
+  const {basePrice, dateFrom, dateTo, checkedDestination, checkedType, checkedOffers} = point;
 
   const eventStartTime = humanizeEventTime(dateFrom);
   const eventEndTime = humanizeEventTime(dateTo);
@@ -124,7 +124,7 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
                     <div class="event__available-offers">
-                    ${createEventsOffersContainer(point, allOffers)}
+                    ${createEventsOffersContainer(checkedType, checkedOffers, allOffers)}
                     </div>
                   </section>
 
@@ -173,6 +173,7 @@ export default class EditPoint extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this._callback.formSubmit(EditPoint.parseStateToPoint(this._state));
+
   };
 
   setCloseFormClickHandler = (callback) => {
@@ -190,25 +191,24 @@ export default class EditPoint extends AbstractStatefulView {
     const newType = evt.target.parentNode.querySelector('.event__type-input').value;
     this.updateElement({
       checkedType: newType,
-      offers: [],
+      checkedOffers: [],
     });
   };
 
-  /*
   #offersToggleHandler = (evt) => {
     evt.preventDefault();
-    console.log(this._state.offers.includes(getNumberFromString( evt.target.id )));
-    const oldOffers = Object.values({...this._state.offers});
-    console.log(evt.target.checked);
-    if (evt.target.parentNode.querySelector('input').checked) {
-      oldOffers.push(4);
-      console.log(oldOffers);
-      this.updateElement({
-        offers: oldOffers,
-      });
+    const oldOffers = this._state.checkedOffers;
+    const newOffer = Number(evt.target.parentNode.querySelector('input').id);
+    let checkedOffersArr = [];
+    if (!evt.target.parentNode.querySelector('input').checked) {
+      checkedOffersArr = oldOffers.concat(newOffer);
+    } else {
+      checkedOffersArr = oldOffers.filter((element) => element !== newOffer);
     }
-    console.log({...this._state});
-  };*/
+    this.updateElement({
+      checkedOffers: checkedOffersArr,
+    });
+  };
 
   #changeDestinationHandler = (evt) => {
     evt.preventDefault();
@@ -219,13 +219,14 @@ export default class EditPoint extends AbstractStatefulView {
 
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#checkedTypeToggleHandler);
-    //this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersToggleHandler);
+    this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersToggleHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestinationHandler);
   };
 
   static parsePointToState = (point) => ({...point,
     checkedType: point.type,
     checkedDestination: point.destination,
+    checkedOffers: point.offers,
   });
 
   static parseStateToPoint = (state) => {
@@ -233,12 +234,12 @@ export default class EditPoint extends AbstractStatefulView {
 
     point.type = point.checkedType;
     point.destination = point.checkedDestination;
+    point.offers = point.checkedOffers;
 
 
     delete point.checkedType;
     delete point.checkedDestination;
-
+    delete point.checkedOffers;
     return point;
   };
-
 }
