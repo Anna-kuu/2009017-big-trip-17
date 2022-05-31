@@ -17,6 +17,7 @@ export default class PointPresenter {
 
   #point = null;
   #offers = null;
+  #destinations = null;
   #mode = Mode.DEFAULT;
 
   constructor(pointListContainer, changeData, changeMode) {
@@ -25,19 +26,20 @@ export default class PointPresenter {
     this.#changeMode = changeMode;
   }
 
-  init = (point, offers = this.#offers) => {
+  init = (point, offers = this.#offers, destinations = this.#destinations) => {
     this.#point = point;
     this.#offers = offers;
+    this.#destinations = destinations;
 
     const prevPointComponent = this.#pointComponent;
     const prevPointEditComponent = this.#pointEditComponent;
 
     this.#pointComponent = new EventsPoint(point, offers);
-    this.#pointEditComponent = new EditPoint(point, offers);
+    this.#pointEditComponent = new EditPoint(point, offers, destinations);
 
     this.#pointComponent.setEditClickHandler(this.#handleEditClick);
-    this.#pointEditComponent.setCloseFormClickHandler(this.#handleFormSubmit);
-    this.#pointEditComponent.setFormSubmitHandler(this.#handleCloseFormClick);
+    this.#pointEditComponent.setCloseFormClickHandler(this.#handleCloseFormClick);
+    this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -64,6 +66,7 @@ export default class PointPresenter {
 
   resetView = () => {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#pointEditComponent.reset(this.#point);
       this.#replaceFormToPoint();
     }
   };
@@ -84,6 +87,7 @@ export default class PointPresenter {
   #onEscKeyDownHandler = (evt) => {
     if (evt.key === 'Escape' || evt.key === 'Esc') {
       evt.preventDefault();
+      this.#pointEditComponent.reset(this.#point);
       this.#replaceFormToPoint();
     }
   };
@@ -92,11 +96,13 @@ export default class PointPresenter {
     this.#replacePointToForm();
   };
 
-  #handleFormSubmit = () => {
+  #handleFormSubmit = (point) => {
+    this.#changeData(point);
     this.#replaceFormToPoint();
   };
 
   #handleCloseFormClick = () => {
+    this.#pointEditComponent.reset(this.#point);
     this.#replaceFormToPoint();
   };
 
