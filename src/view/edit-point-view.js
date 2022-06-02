@@ -202,9 +202,9 @@ export default class EditPoint extends AbstractStatefulView {
     this._callback.formClick();
   };
 
-  #dateFromChangeHandler = ([userDate]) => {
+  #dateFromChangeHandler = ([userDateFrom]) => {
     this.updateElement({
-      dateFrom: userDate,
+      dateFrom: userDateFrom,
     });
   };
 
@@ -216,15 +216,15 @@ export default class EditPoint extends AbstractStatefulView {
           enableTime: true,
           dateFormat: 'd/m/Y H:i',
           defaultDate: this._state.dateFrom,
-          onCLose: this.#dateFromChangeHandler,
+          onChange: this.#dateFromChangeHandler,
         },
       );
     }
   };
 
-  #dateToChangeHandler = ([userDate]) => {
+  #dateToChangeHandler = ([userDateTo]) => {
     this.updateElement({
-      dateTo: userDate,
+      dateTo: userDateTo,
     });
   };
 
@@ -236,7 +236,7 @@ export default class EditPoint extends AbstractStatefulView {
           enableTime: true,
           dateFormat: 'd/m/Y H:i',
           defaultDate: this._state.dateTo,
-          onClose: this.#dateToChangeHandler,
+          onChange: this.#dateToChangeHandler,
         },
       );
     }
