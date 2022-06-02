@@ -1,4 +1,13 @@
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
+
+
+const a = dayjs('2019-07-10T08:45:56.845Z');
+const b = dayjs('2019-07-10T13:45:56.375Z');
+const ab = dayjs.duration(b.diff(a));
+console.log(ab);
+console.log(ab.format('DD HH[H] mm[M]'));
 
 const humanizePointEventDate = (date) => dayjs(date).format('MMM D');
 const humanizePointTime = (date) => dayjs(date).format('HH-mm');
