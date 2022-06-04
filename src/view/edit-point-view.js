@@ -1,13 +1,19 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeEventTime} from '../utils/point.js';
 import { TYPES } from '../const.js';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANC_POINT = {
+  id: null,
   basePrice: '',
-  dateFrom: '2019-07-10T22:55:56.845Z',
-  dateTo: '2019-07-11T11:22:13.375Z',
-  destination: 'Geneva',
-  type: 'taxi',
+  dateFrom: null,
+  dateTo: null,
+  destination: null,
+  isFavorite: false,
+  offers: [],
+  type: TYPES[0],
 };
 
 const createEventsTypeContainer = (currentType) => TYPES.map((type) =>
@@ -84,7 +90,6 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                       <img class="event__type-icon" width="17" height="17" src="img/icons/${checkedType}.png" alt="Event type icon">
                     </label>
                     <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
-
                     <div class="event__type-list">
                       <fieldset class="event__type-group">
                         <legend class="visually-hidden">Event type</legend>
@@ -94,9 +99,6 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                     </div>
                   </div>
                   ${selectDestinationTemplate}
-
-
-
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
                     <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventStartTime}">
@@ -104,7 +106,6 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                     <label class="visually-hidden" for="event-end-time-1">To</label>
                     <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventEndTime}">
                   </div>
-
                   <div class="event__field-group  event__field-group--price">
                     <label class="event__label" for="event-price-1">
                       <span class="visually-hidden">Price</span>
@@ -112,7 +113,6 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                     </label>
                     <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${basePrice}">
                   </div>
-
                   <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
                   <button class="event__reset-btn" type="reset">Delete</button>
                   <button class="event__rollup-btn" type="button">
@@ -122,14 +122,11 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                 <section class="event__details">
                   <section class="event__section  event__section--offers">
                     <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
                     <div class="event__available-offers">
                     ${createEventsOffersContainer(checkedType, checkedOffers, allOffers)}
                     </div>
                   </section>
-
                   ${destinationTemplate}
-
                 </section>
               </form>
             </li>`
@@ -137,6 +134,8 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
 };
 
 export default class EditPoint extends AbstractStatefulView {
+  #dateFromPicker = null;
+  #dateToPicker = null;
   #offers = null;
   #destinations = null;
 
@@ -147,22 +146,40 @@ export default class EditPoint extends AbstractStatefulView {
     this.#destinations = destinations;
 
     this.#setInnerHandlers();
+    this.#setDateFromPicker();
+    this.#setDateToPicker();
   }
 
   get template() {
     return createEditPointTemplate(this._state, this.#offers, this.#destinations);
   }
 
-  _restoreHandlers = () => {
-    this.#setInnerHandlers();
-    this.setFormSubmitHandler(this._callback.formSubmit);
-    this.setCloseFormClickHandler(this._callback.formClick);
+  removeElement = () => {
+    super.removeElement();
+
+    if (this.#dateFromPicker) {
+      this.#dateFromPicker.destroy();
+      this.#dateFromPicker = null;
+    }
+
+    if (this.#dateToPicker) {
+      this.#dateToPicker.destroy();
+      this.#dateToPicker = null;
+    }
   };
 
   reset = (point) => {
     this.updateElement(
       EditPoint.parsePointToState(point),
     );
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setCloseFormClickHandler(this._callback.formClick);
+    this.#setDateFromPicker();
+    this.#setDateToPicker();
   };
 
   setFormSubmitHandler = (callback) => {
@@ -173,7 +190,6 @@ export default class EditPoint extends AbstractStatefulView {
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this._callback.formSubmit(EditPoint.parseStateToPoint(this._state));
-
   };
 
   setCloseFormClickHandler = (callback) => {
@@ -184,6 +200,46 @@ export default class EditPoint extends AbstractStatefulView {
   #formClickHandler = (evt) => {
     evt.preventDefault();
     this._callback.formClick();
+  };
+
+  #dateFromChangeHandler = ([userDateFrom]) => {
+    this.updateElement({
+      dateFrom: userDateFrom,
+    });
+  };
+
+  #setDateFromPicker = () => {
+    if (this._state.dateFrom) {
+      this.#dateFromPicker = flatpickr(
+        this.element.querySelector('input[name="event-start-time"]'),
+        {
+          enableTime: true,
+          dateFormat: 'd/m/Y H:i',
+          defaultDate: this._state.dateFrom,
+          onChange: this.#dateFromChangeHandler,
+        },
+      );
+    }
+  };
+
+  #dateToChangeHandler = ([userDateTo]) => {
+    this.updateElement({
+      dateTo: userDateTo,
+    });
+  };
+
+  #setDateToPicker = () => {
+    if (this._state.dateTo) {
+      this.#dateToPicker = flatpickr(
+        this.element.querySelector('input[name="event-end-time"]'),
+        {
+          enableTime: true,
+          dateFormat: 'd/m/Y H:i',
+          defaultDate: this._state.dateTo,
+          onChange: this.#dateToChangeHandler,
+        },
+      );
+    }
   };
 
   #checkedTypeToggleHandler = (evt) => {
@@ -235,7 +291,6 @@ export default class EditPoint extends AbstractStatefulView {
     point.type = point.checkedType;
     point.destination = point.checkedDestination;
     point.offers = point.checkedOffers;
-
 
     delete point.checkedType;
     delete point.checkedDestination;
