@@ -4,6 +4,8 @@ import ListEmptyView from '../view/list-empty-view.js';
 import {render} from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import {updateItem} from '../utils/common.js';
+import {SortType} from '../const.js';
+import {sortByTime, sortByPrice} from '../utils/point.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -15,6 +17,8 @@ export default class BoardPresenter {
   #boardPoints = [];
   #boardOffers = [];
   #pointPresenter = new Map();
+  #currentSortType = SortType.DEFAULT;
+  #sourcedBoardPoints = [];
 
   constructor(boardContainer, pointsModel, allDestinations) {
     this.#boardContainer = boardContainer;
@@ -24,6 +28,7 @@ export default class BoardPresenter {
 
   init = () => {
     this.#boardPoints = [...this.#pointsModel.points];
+    this.#sourcedBoardPoints = [...this.#pointsModel.points];
     this.#boardOffers = [...this.#pointsModel.offers];
     this.#renderBoard();
   };
@@ -34,11 +39,39 @@ export default class BoardPresenter {
 
   #handlePointChange = (updatedPoint) => {
     this.#boardPoints = updateItem(this.#boardPoints, updatedPoint);
+    this.#sourcedBoardPoints = updateItem(this.#sourcedBoardPoints, updatedPoint);
     this.#pointPresenter.get(updatedPoint.id).init(updatedPoint);
+  };
+
+  #sortPoints = (sortType) => {
+    switch (sortType) {
+      case SortType.TIME:
+        this.#boardPoints.sort(sortByTime);
+        break;
+      case SortType.PRICE:
+        this.#boardPoints.sort(sortByPrice);
+        break;
+      default:
+        this.#boardPoints = [...this.#sourcedBoardPoints];
+    }
+    this.#currentSortType = sortType;
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    console.log(sortType);
+    console.log(this.#currentSortType);
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortPoints(sortType);
+    this.#clearTripList();
+    this.#renderTripList();
   };
 
   #renderSort = () => {
     render(this.#sortComponent, this.#boardContainer);
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
   #renderTripList = () => {
