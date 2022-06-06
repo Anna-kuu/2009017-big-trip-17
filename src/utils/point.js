@@ -4,7 +4,6 @@ dayjs.extend(duration);
 
 const humanizePointEventDate = (date) => dayjs(date).format('MMM D');
 const humanizePointTime = (date) => dayjs(date).format('HH-mm');
-
 const humanizeEventTime = (date) => dayjs(date).format('DD/MM/YYYY HH-mm');
 
 const humanizePointDuration = (dateFrom, dateTo) => {
@@ -23,4 +22,14 @@ const humanizePointDuration = (dateFrom, dateTo) => {
   return minutesDuration.format('DD[D] HH[H] mm[M]');
 };
 
-export {humanizePointEventDate, humanizePointTime, humanizePointDuration, humanizeEventTime};
+const sortByTime = (pointA, pointB) => {
+  const durationA = dayjs(pointA.dateTo).diff(dayjs(pointB.dateFrom));
+  const durationB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
+
+  return durationB - durationA;
+};
+
+const sortByPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice;
+
+
+export {humanizePointEventDate, humanizePointTime, humanizePointDuration, humanizeEventTime, sortByTime, sortByPrice};
