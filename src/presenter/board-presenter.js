@@ -58,8 +58,6 @@ export default class BoardPresenter {
   };
 
   #handleSortTypeChange = (sortType) => {
-    console.log(sortType);
-    console.log(this.#currentSortType);
     if (this.#currentSortType === sortType) {
       return;
     }
