@@ -9,21 +9,21 @@ const humanizeEventTime = (date) => dayjs(date).format('DD/MM/YYYY HH-mm');
 const humanizePointDuration = (dateFrom, dateTo) => {
   const start = dayjs(dateFrom);
   const finish = dayjs(dateTo);
-  const minutesDuration = dayjs.duration(finish.diff(start));
+  const eventDuration = dayjs.duration(finish.diff(start));
 
-  if (minutesDuration.days() === 0) {
-    return minutesDuration.format('HH[H] mm[M]');
+  if (eventDuration.days() === 0) {
+    return eventDuration.format('HH[H] mm[M]');
   }
 
-  if (minutesDuration.days() === 0 && minutesDuration.hours() === 0) {
-    return minutesDuration.format('mm[M]');
+  if (eventDuration.days() === 0 && eventDuration.hours() === 0) {
+    return eventDuration.format('mm[M]');
   }
 
-  return minutesDuration.format('DD[D] HH[H] mm[M]');
+  return eventDuration.format('DD[D] HH[H] mm[M]');
 };
 
 const sortByTime = (pointA, pointB) => {
-  const durationA = dayjs(pointA.dateTo).diff(dayjs(pointB.dateFrom));
+  const durationA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
   const durationB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
 
   return durationB - durationA;
