@@ -182,6 +182,16 @@ export default class EditPoint extends AbstractStatefulView {
     this.#setDateToPicker();
   };
 
+  setDeleteClickHandler = (callback) => {
+    this._callback.deleteClick = callback;
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteHandler);
+  };
+
+  #formDeleteHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.deleteClick(EditPoint.parseStateToPoint(this._state));
+  };
+
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
     this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);

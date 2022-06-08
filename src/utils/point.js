@@ -22,6 +22,8 @@ const humanizePointDuration = (dateFrom, dateTo) => {
   return eventDuration.format('DD[D] HH[H] mm[M]');
 };
 
+const isDatesEqual = (dateA, dateB) => (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'mm');
+
 const sortByTime = (pointA, pointB) => {
   const durationA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
   const durationB = dayjs(pointB.dateTo).diff(dayjs(pointB.dateFrom));
@@ -32,4 +34,4 @@ const sortByTime = (pointA, pointB) => {
 const sortByPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice;
 
 
-export {humanizePointEventDate, humanizePointTime, humanizePointDuration, humanizeEventTime, sortByTime, sortByPrice};
+export {humanizePointEventDate, humanizePointTime, humanizePointDuration, humanizeEventTime, isDatesEqual, sortByTime, sortByPrice};
