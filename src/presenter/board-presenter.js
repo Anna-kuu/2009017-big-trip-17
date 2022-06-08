@@ -3,36 +3,44 @@ import TripListView from '../view/list-container-view.js';
 import ListEmptyView from '../view/list-empty-view.js';
 import {remove, render} from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
-import {SortType, UpdateType, UserAction} from '../const.js';
-import {sortByTime, sortByPrice} from '../utils/point.js';
+import {FilterType, SortType, UpdateType, UserAction} from '../const.js';
+import {sortByTime, sortByPrice, filter} from '../utils/point.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
   #pointsModel = null;
   #allDestinations = null;
+  #filterModel = null;
   #tripListComponent = new TripListView();
   #sortComponent = null;
-  #listEmptyComponent = new ListEmptyView();
+  #listEmptyComponent = null;
   #boardOffers = [];
   #pointPresenter = new Map();
   #currentSortType = SortType.DEFAULT;
+  #filterType = FilterType.EVERYTHING;
 
-  constructor(boardContainer, pointsModel, allDestinations) {
+  constructor(boardContainer, pointsModel, allDestinations, filterModel) {
     this.#boardContainer = boardContainer;
     this.#pointsModel = pointsModel;
     this.#allDestinations = allDestinations;
+    this.#filterModel = filterModel;
 
     this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get points() {
+    this.#filterType = this.#filterModel.filter;
+    const points = this.#pointsModel.points;
+    const filteredPoints = filter[this.#filterType](points);
+
     switch (this.#currentSortType) {
       case SortType.TIME:
-        return [...this.#pointsModel.points].sort(sortByTime);
+        return filteredPoints.sort(sortByTime);
       case SortType.PRICE:
-        return [...this.#pointsModel.points].sort(sortByPrice);
+        return filteredPoints.sort(sortByPrice);
     }
-    return this.#pointsModel.points;
+    return filteredPoints;
   }
 
   init = () => {
@@ -97,6 +105,7 @@ export default class BoardPresenter {
   };
 
   #renderListEmpty = () => {
+    this.#listEmptyComponent = new ListEmptyView(this.#filterType);
     render(this.#listEmptyComponent, this.#boardContainer);
   };
 
@@ -115,7 +124,10 @@ export default class BoardPresenter {
     this.#pointPresenter.clear();
 
     remove(this.#sortComponent);
-    remove(this.#listEmptyComponent);
+
+    if (this.#listEmptyComponent) {
+      remove(this.#listEmptyComponent);
+    }
 
     if (resetSortType) {
       this.#currentSortType = SortType.DEFAULT;

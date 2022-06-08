@@ -1,6 +1,11 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import { FilterType } from '../const';
 dayjs.extend(duration);
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
 
 const humanizePointEventDate = (date) => dayjs(date).format('MMM D');
 const humanizePointTime = (date) => dayjs(date).format('HH-mm');
@@ -33,5 +38,10 @@ const sortByTime = (pointA, pointB) => {
 
 const sortByPrice = (pointA, pointB) => pointB.basePrice - pointA.basePrice;
 
+const filter = {
+  [FilterType.EVERYTHING] : (points) => points,
+  [FilterType.FUTURE] : (points) => points.filter((point) => dayjs(point.dateFrom).isSameOrAfter(dayjs())),
+  [FilterType.PAST] : (points) => points.filter((point) => dayjs(point.dateTo).isSameOrBefore(dayjs())),
+};
 
-export {humanizePointEventDate, humanizePointTime, humanizePointDuration, humanizeEventTime, isDatesEqual, sortByTime, sortByPrice};
+export {humanizePointEventDate, humanizePointTime, humanizePointDuration, humanizeEventTime, isDatesEqual, sortByTime, sortByPrice, filter};
