@@ -2,15 +2,16 @@ import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import {humanizeEventTime} from '../utils/point.js';
 import { TYPES } from '../const.js';
 import flatpickr from 'flatpickr';
+import {today} from '../utils/point.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANC_POINT = {
   id: null,
   basePrice: '',
-  dateFrom: null,
-  dateTo: null,
-  destination: null,
+  dateFrom: today,
+  dateTo: today,
+  destination: 'Amsterdam',
   isFavorite: false,
   offers: [],
   type: TYPES[0],
@@ -139,7 +140,7 @@ export default class EditPoint extends AbstractStatefulView {
   #offers = null;
   #destinations = null;
 
-  constructor(point = BLANC_POINT, offers, destinations) {
+  constructor(offers, destinations, point = BLANC_POINT) {
     super();
     this._state = EditPoint.parsePointToState(point);
     this.#offers = offers;
