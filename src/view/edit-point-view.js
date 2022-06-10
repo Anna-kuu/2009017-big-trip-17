@@ -1,6 +1,6 @@
 import he from 'he';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-import {humanizeEventTime} from '../utils/point.js';
+//import {humanizeEventTime} from '../utils/point.js';
 import { TYPES } from '../const.js';
 import flatpickr from 'flatpickr';
 import {today} from '../utils/point.js';
@@ -12,7 +12,7 @@ const BLANC_POINT = {
   basePrice: '',
   dateFrom: today,
   dateTo: today,
-  destination: 'Amsterdam',
+  destination: '',
   isFavorite: false,
   offers: [],
   type: TYPES[0],
@@ -27,20 +27,36 @@ const createEventsTypeContainer = (currentType) => TYPES.map((type) =>
 
 const createEventsOffersContainer = (checkedType, checkedOffers, allOffers) => {
   const pointTypeOffer = allOffers.find((offer) => offer.type === checkedType);
-  let eventOffers = '';
-  pointTypeOffer.offers.map((offer) => {
-    const checked = checkedOffers.includes(offer.id) ? 'checked' : '';
-    eventOffers += `<div class="event__offer-selector">
-    <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage" ${checked}>
-    <label class="event__offer-label" for="${offer.id}">
-      <span class="event__offer-title">${offer.title}</span>
-      &plus;&euro;&nbsp;
-      <span class="event__offer-price">${offer.price}</span>
-    </label>
-  </div>`;
-  });
-  return eventOffers;
+  if (pointTypeOffer.offers.length === 0) {
+    return (`
+      <section class="event__section  event__section--offers visually-hidden">
+        <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+        <div class="event__available-offers">
+
+        </div>
+      </section>`);
+  } else {
+    const eventOffers = pointTypeOffer.offers.map((offer) => {
+      const checked = checkedOffers.includes(offer.id) ? 'checked' : '';
+      return (`<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage" ${checked}>
+          <label class="event__offer-label" for="${offer.id}">
+            <span class="event__offer-title">${offer.title}</span>
+            &plus;&euro;&nbsp;
+            <span class="event__offer-price">${offer.price}</span>
+          </label>
+        </div>`);
+    }).join('');
+    return (`
+      <section class="event__section  event__section--offers">
+        <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+        <div class="event__available-offers">
+        ${eventOffers}
+        </div>
+      </section>`);
+  }
 };
+
 
 const createSelectDestinationTemplate = (destination, checkedType) => (
   `<div class="event__field-group  event__field-group--destination">
@@ -57,26 +73,30 @@ const createSelectDestinationTemplate = (destination, checkedType) => (
 
 const createDestinationTemplate = (allDestinations, checkedDestination) => {
   const pointDestinationType = allDestinations.find((destination) => destination.name === checkedDestination);
+  if (checkedDestination === '')  {
+    return '';
+  }
+
+  if (pointDestinationType.pictures.length === 0) {
+    return '';
+  }
   const pointDestinationPhoto = pointDestinationType.pictures.map((picture) => `<img class="event__photo" src="${picture.src}" alt="Event photo">`).join('');
 
   return (
     `<section class="event__section  event__section--destination">
-      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-      <p class="event__destination-description">${pointDestinationType.description}</p>
+        <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+        <p class="event__destination-description">${pointDestinationType.description}</p>
 
-      <div class="event__photos-container">
-      <div class="event__photos-tape">
-      ${pointDestinationPhoto}
-      </div>
-    </div>
-    </section>`);
+        <div class="event__photos-container">
+          <div class="event__photos-tape">
+          ${pointDestinationPhoto}
+          </div>
+        </div>
+      </section>`);
 };
 
 const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
   const {basePrice, dateFrom, dateTo, checkedDestination, checkedType, checkedOffers} = point;
-
-  const eventStartTime = humanizeEventTime(dateFrom);
-  const eventEndTime = humanizeEventTime(dateTo);
 
   const selectDestinationTemplate = createSelectDestinationTemplate(checkedDestination, checkedType);
   const destinationTemplate = createDestinationTemplate(allDestinations, checkedDestination);
@@ -103,10 +123,10 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                   ${selectDestinationTemplate}
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventStartTime}">
+                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateFrom}">
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-1">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventEndTime}">
+                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateTo}">
                   </div>
                   <div class="event__field-group  event__field-group--price">
                     <label class="event__label" for="event-price-1">
@@ -122,13 +142,8 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                   </button>
                 </header>
                 <section class="event__details">
-                  <section class="event__section  event__section--offers">
-                    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-                    <div class="event__available-offers">
                     ${createEventsOffersContainer(checkedType, checkedOffers, allOffers)}
-                    </div>
-                  </section>
-                  ${destinationTemplate}
+                   ${destinationTemplate}
                 </section>
               </form>
             </li>`
@@ -202,6 +217,7 @@ export default class EditPoint extends AbstractStatefulView {
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
+    console.log(this._state);
     this._callback.formSubmit(EditPoint.parseStateToPoint(this._state));
   };
 
