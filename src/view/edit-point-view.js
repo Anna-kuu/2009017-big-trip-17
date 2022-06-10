@@ -180,6 +180,7 @@ export default class EditPoint extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setCloseFormClickHandler(this._callback.formClick);
+    this.setDeleteClickHandler(this._callback.deleteClick);
     this.#setDateFromPicker();
     this.#setDateToPicker();
   };
@@ -285,10 +286,18 @@ export default class EditPoint extends AbstractStatefulView {
     });
   };
 
+  #changePriceHandler = (evt) => {
+    evt.preventDefault();
+    this._setState({
+      basePrice: evt.target.value,
+    });
+  };
+
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#checkedTypeToggleHandler);
     this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersToggleHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestinationHandler);
+    this.element.querySelector('.event__input--price').addEventListener('input', this.#changePriceHandler);
   };
 
   static parsePointToState = (point) => ({...point,
