@@ -5,7 +5,7 @@ import {remove, render} from '../framework/render.js';
 import PointPresenter from './point-presenter.js';
 import PointNewPresenter from './point-new-presenter.js';
 import {FilterType, SortType, UpdateType, UserAction} from '../const.js';
-import {sortByTime, sortByPrice, filter} from '../utils/point.js';
+import {sortByDay, sortByTime, sortByPrice, filter} from '../utils/point.js';
 
 export default class BoardPresenter {
   #boardContainer = null;
@@ -44,7 +44,7 @@ export default class BoardPresenter {
       case SortType.PRICE:
         return filteredPoints.sort(sortByPrice);
     }
-    return filteredPoints;
+    return filteredPoints.sort(sortByDay);
   }
 
   init = () => {

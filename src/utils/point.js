@@ -7,7 +7,7 @@ dayjs.extend(duration);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
-const today = dayjs();
+const today = dayjs().format('DD/MM/YYYY HH-mm');
 
 const humanizePointEventDate = (date) => dayjs(date).format('MMM D');
 const humanizePointTime = (date) => dayjs(date).format('HH-mm');
@@ -18,18 +18,20 @@ const humanizePointDuration = (dateFrom, dateTo) => {
   const finish = dayjs(dateTo);
   const eventDuration = dayjs.duration(finish.diff(start));
 
-  if (eventDuration.days() === 0) {
-    return eventDuration.format('HH[H] mm[M]');
-  }
-
   if (eventDuration.days() === 0 && eventDuration.hours() === 0) {
     return eventDuration.format('mm[M]');
+  }
+
+  if (eventDuration.days() === 0) {
+    return eventDuration.format('HH[H] mm[M]');
   }
 
   return eventDuration.format('DD[D] HH[H] mm[M]');
 };
 
 const isDatesEqual = (dateA, dateB) => (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'mm');
+
+const sortByDay = (pointA, pointB) => dayjs(pointA.dateFrom) - dayjs(pointB.dateFrom);
 
 const sortByTime = (pointA, pointB) => {
   const durationA = dayjs(pointA.dateTo).diff(dayjs(pointA.dateFrom));
@@ -46,4 +48,4 @@ const filter = {
   [FilterType.PAST] : (points) => points.filter((point) => dayjs(point.dateTo).isSameOrBefore(dayjs())),
 };
 
-export {humanizePointEventDate, humanizePointTime, humanizePointDuration, humanizeEventTime, isDatesEqual, sortByTime, sortByPrice, filter, today};
+export {humanizePointEventDate, humanizePointTime, humanizePointDuration, humanizeEventTime, isDatesEqual, sortByDay, sortByTime, sortByPrice, filter, today};

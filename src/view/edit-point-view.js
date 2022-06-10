@@ -249,6 +249,7 @@ export default class EditPoint extends AbstractStatefulView {
           enableTime: true,
           dateFormat: 'd/m/Y H:i',
           defaultDate: this._state.dateTo,
+          minDate: this._state.dateFrom,
           onChange: this.#dateToChangeHandler,
         },
       );
