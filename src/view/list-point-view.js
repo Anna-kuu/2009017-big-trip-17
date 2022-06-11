@@ -1,22 +1,27 @@
+import he from 'he';
 import AbstractView from '../framework/view/abstract-view.js';
 import { humanizePointEventDate, humanizePointTime, humanizePointDuration } from '../utils/point.js';
 
+const createOffersTemplate = (offers, type, allOffers) => {
+  const pointTypeOffer = allOffers.find((offer) => offer.type === type);
+  let offerTemplate = '';
+  if (pointTypeOffer.offers.length !== 0) {
+    offerTemplate =  offers.map((offerId) => {
+      const offerObject = pointTypeOffer.offers.find((element) => element.id === offerId);
+      return (`<li class="event__offer">
+      <span class="event__offer-title">${offerObject.title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offerObject.price}</span>
+      </li>`);
+    }).join('');
+  }
+  return (`<ul class="event__selected-offers">
+    ${offerTemplate}
+  </ul>`);
+};
+
 const createEventsTemplate = (point, allOffers) => {
   const {basePrice, type, dateFrom, dateTo, isFavorite, offers, destination} = point;
-  const pointTypeOffer = allOffers.find((offer) => offer.type === type);
-
-  let offerTemplate = '<ul class="event__selected-offers">';
-
-  offers.forEach((offerId) => {
-    const offerObject = pointTypeOffer.offers.find((element) => element.id === offerId);
-
-    offerTemplate += `<li class="event__offer">
-    <span class="event__offer-title">${offerObject.title}</span>
-    &plus;&euro;&nbsp;
-    <span class="event__offer-price">${offerObject.price}</span>
-    </li>`;
-  });
-  offerTemplate += '</ul>';
 
   const eventDate = humanizePointEventDate(dateFrom);
   const startTime = humanizePointTime(dateFrom);
@@ -34,7 +39,7 @@ const createEventsTemplate = (point, allOffers) => {
       <div class="event__type">
         <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
       </div>
-      <h3 class="event__title">${type.charAt(0).toUpperCase() + type.slice(1)} ${destination}</h3>
+      <h3 class="event__title">${type.charAt(0).toUpperCase() + type.slice(1)} ${he.encode(destination)}</h3>
       <div class="event__schedule">
         <p class="event__time">
           <time class="event__start-time" datetime="2019-03-18T10:30">${startTime}</time>
@@ -47,7 +52,7 @@ const createEventsTemplate = (point, allOffers) => {
         &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
       </p>
       <h4 class="visually-hidden">Offers:</h4>
-      ${offerTemplate}
+      ${createOffersTemplate(offers, type, allOffers)}
       <button class="${favoriteClassName}" type="button">
         <span class="visually-hidden">Add to favorite</span>
         <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
