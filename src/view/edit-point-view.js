@@ -1,7 +1,5 @@
 import he from 'he';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
-//import {humanizeEventTime} from '../utils/point.js';
-import { TYPES } from '../const.js';
 import flatpickr from 'flatpickr';
 import {today} from '../utils/point.js';
 
@@ -12,20 +10,24 @@ const BLANC_POINT = {
   basePrice: '',
   dateFrom: today,
   dateTo: today,
-  destination: '',
+  destination: {
+    description: '',
+    name: '',
+    offers: [],
+  },
   isFavorite: false,
   offers: [],
-  type: TYPES[0],
+  type: 'taxi',
 };
 
-const createEventsTypeContainer = (currentType) => TYPES.map((type) =>
+const createEventsTypeContainer = (currentType, allOffers) => allOffers.map((offer) =>
   `<div class="event__type-item">
-    <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}"${currentType === type ? 'checked' : ''}>
-    <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type.charAt(0).toUpperCase() + type.slice(1)}</label>
+    <input id="event-type-${offer.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${offer.type}"${currentType === offer.type ? 'checked' : ''}>
+    <label class="event__type-label  event__type-label--${offer.type}" for="event-type-${offer.type}-1">${offer.type.charAt(0).toUpperCase() + offer.type.slice(1)}</label>
   </div>`
 ).join('');
 
-const createEventsOffersContainer = (checkedType, checkedOffers, allOffers) => {
+const createEventsOffersContainer = (checkedType, checkedOffers, allOffers, isDisabled) => {
   const pointTypeOffer = allOffers.find((offer) => offer.type === checkedType);
   if (pointTypeOffer.offers.length === 0) {
     return (`
@@ -39,8 +41,8 @@ const createEventsOffersContainer = (checkedType, checkedOffers, allOffers) => {
     const eventOffers = pointTypeOffer.offers.map((offer) => {
       const checked = checkedOffers.includes(offer.id) ? 'checked' : '';
       return (`<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage" ${checked}>
-          <label class="event__offer-label" for="${offer.id}">
+        <input class="event__offer-checkbox  visually-hidden" id="${offer.id}" type="checkbox" name="event-offer-luggage" ${checked} ${isDisabled ? 'disabled' : ''}>
+          <label class="event__offer-label" for="${offer.id}" >
             <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
             <span class="event__offer-price">${offer.price}</span>
@@ -58,25 +60,25 @@ const createEventsOffersContainer = (checkedType, checkedOffers, allOffers) => {
 };
 
 
-const createSelectDestinationTemplate = (destination, checkedType) => (
-  `<div class="event__field-group  event__field-group--destination">
-    <label class="event__label  event__type-output" for="event-destination-1">
-    ${checkedType.charAt(0).toUpperCase() + checkedType.slice(1)}</label>
-    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination)}" list="destination-list-1">
-    <datalist id="destination-list-1">
-      <option value="Amsterdam"></option>
-      <option value="Geneva"></option>
-      <option value="Chamonix"></option>
-    </datalist>
-  </div>`
-);
+const createSelectDestinationTemplate = (destination, checkedType, allDestinations, isDisabled) => {
+  const destinationList = allDestinations.map((option) => (`<option value="${option.name}"></option>`)).join('');
+  return (
+    `<div class="event__field-group  event__field-group--destination">
+      <label class="event__label  event__type-output" for="event-destination-1">
+      ${checkedType.charAt(0).toUpperCase() + checkedType.slice(1)}</label>
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination)}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
+      <datalist id="destination-list-1">
+        ${destinationList}
+      </datalist>
+    </div>`
+  );
+};
 
 const createDestinationTemplate = (allDestinations, checkedDestination) => {
   const pointDestinationType = allDestinations.find((destination) => destination.name === checkedDestination);
   if (checkedDestination === '')  {
     return '';
   }
-
   if (pointDestinationType.pictures.length === 0) {
     return '';
   }
@@ -96,9 +98,9 @@ const createDestinationTemplate = (allDestinations, checkedDestination) => {
 };
 
 const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
-  const {basePrice, dateFrom, dateTo, checkedDestination, checkedType, checkedOffers} = point;
 
-  const selectDestinationTemplate = createSelectDestinationTemplate(checkedDestination, checkedType);
+  const {basePrice, dateFrom, dateTo, checkedDestination, checkedType, checkedOffers, isDisabled, isSaving, isDeleting} = point;
+  const selectDestinationTemplate = createSelectDestinationTemplate(checkedDestination, checkedType,  allDestinations);
   const destinationTemplate = createDestinationTemplate(allDestinations, checkedDestination);
 
 
@@ -111,11 +113,11 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                       <span class="visually-hidden">Choose event type</span>
                       <img class="event__type-icon" width="17" height="17" src="img/icons/${checkedType}.png" alt="Event type icon">
                     </label>
-                    <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+                    <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox" ${isDisabled ? 'disabled' : ''}>
                     <div class="event__type-list">
                       <fieldset class="event__type-group">
                         <legend class="visually-hidden">Event type</legend>
-                        ${createEventsTypeContainer(checkedType)}
+                        ${createEventsTypeContainer(checkedType, allOffers)}
 
                       </fieldset>
                     </div>
@@ -123,26 +125,26 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                   ${selectDestinationTemplate}
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateFrom}">
+                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateFrom}" ${isDisabled ? 'disabled' : ''}>
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-1">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateTo}">
+                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateTo}" ${isDisabled ? 'disabled' : ''}>
                   </div>
                   <div class="event__field-group  event__field-group--price">
                     <label class="event__label" for="event-price-1">
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}">
+                    <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}"  ${isDisabled ? 'disabled' : ''}>
                   </div>
-                  <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-                  <button class="event__reset-btn" type="reset">Delete</button>
-                  <button class="event__rollup-btn" type="button">
+                  <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+                  <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
+                  <button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
                     <span class="visually-hidden">Open event</span>
                   </button>
                 </header>
                 <section class="event__details">
-                    ${createEventsOffersContainer(checkedType, checkedOffers, allOffers)}
+                    ${createEventsOffersContainer(checkedType, checkedOffers, allOffers, isDisabled)}
                    ${destinationTemplate}
                 </section>
               </form>
@@ -318,20 +320,27 @@ export default class EditPoint extends AbstractStatefulView {
 
   static parsePointToState = (point) => ({...point,
     checkedType: point.type,
-    checkedDestination: point.destination,
+    checkedDestination: point.destination.name,
     checkedOffers: point.offers,
+    isDisabled: false,
+    isSaving: false,
+    isDeleting: false,
   });
 
   static parseStateToPoint = (state) => {
     const point = {...state};
 
     point.type = point.checkedType;
-    point.destination = point.checkedDestination;
+    point.destination.name = point.checkedDestination;
     point.offers = point.checkedOffers;
 
     delete point.checkedType;
     delete point.checkedDestination;
     delete point.checkedOffers;
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
+
     return point;
   };
 }
