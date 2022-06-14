@@ -1,18 +1,16 @@
+import { UpdateType } from '../const.js';
 import Observable from '../framework/observable.js';
-import { generateOffer, generatePoint } from '../mock/point.js';
+//import { generateOffer, generatePoint } from '../mock/point.js';
 
 export default class PointsModel extends Observable {
   #pointsApiService = null;
-  #points = Array.from({length:10}, generatePoint);
-  #offers = Array.from({length:1}, generateOffer);
+  #points = [];
+  #offers = [];
+  #destinations = [];
 
   constructor(pointsApiService) {
     super();
     this.#pointsApiService = pointsApiService;
-
-    this.#pointsApiService.points.then((points) => {
-      console.log(points.map(this.#adaptToClient));
-    });
   }
 
   get points() {
@@ -22,6 +20,27 @@ export default class PointsModel extends Observable {
   get offers() {
     return this.#offers;
   }
+
+  get destinations() {
+    return this.#destinations;
+  }
+
+  init = async () => {
+    try {
+      const points = await this.#pointsApiService.points;
+      const offers = await this.#pointsApiService.offers;
+      const destinations = await this.#pointsApiService.destinations;
+      this.#points = points.map(this.#adaptToClient);
+      this.#offers = offers;
+      this.#destinations = destinations;
+    } catch(err) {
+      this.#points = [];
+      this.#offers = [];
+      this.#destinations = [];
+    }
+
+    this._notify(UpdateType.INIT);
+  };
 
   updatePoint = (updateType, update) => {
     const index = this.#points.findIndex((point) => point.id === update.id);

@@ -1,7 +1,6 @@
 import he from 'he';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 //import {humanizeEventTime} from '../utils/point.js';
-import { TYPES } from '../const.js';
 import flatpickr from 'flatpickr';
 import {today} from '../utils/point.js';
 
@@ -12,16 +11,20 @@ const BLANC_POINT = {
   basePrice: '',
   dateFrom: today,
   dateTo: today,
-  destination: '',
+  destination: {
+    description: '',
+    name: '',
+    offers: [],
+  },
   isFavorite: false,
   offers: [],
-  type: TYPES[0],
+  type: 'taxi',
 };
 
-const createEventsTypeContainer = (currentType) => TYPES.map((type) =>
+const createEventsTypeContainer = (currentType, allOffers) => allOffers.map((offer) =>
   `<div class="event__type-item">
-    <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}"${currentType === type ? 'checked' : ''}>
-    <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${type.charAt(0).toUpperCase() + type.slice(1)}</label>
+    <input id="event-type-${offer.type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${offer.type}"${currentType === offer.type ? 'checked' : ''}>
+    <label class="event__type-label  event__type-label--${offer.type}" for="event-type-${offer.type}-1">${offer.type.charAt(0).toUpperCase() + offer.type.slice(1)}</label>
   </div>`
 ).join('');
 
@@ -58,25 +61,25 @@ const createEventsOffersContainer = (checkedType, checkedOffers, allOffers) => {
 };
 
 
-const createSelectDestinationTemplate = (destination, checkedType) => (
-  `<div class="event__field-group  event__field-group--destination">
-    <label class="event__label  event__type-output" for="event-destination-1">
-    ${checkedType.charAt(0).toUpperCase() + checkedType.slice(1)}</label>
-    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination)}" list="destination-list-1">
-    <datalist id="destination-list-1">
-      <option value="Amsterdam"></option>
-      <option value="Geneva"></option>
-      <option value="Chamonix"></option>
-    </datalist>
-  </div>`
-);
+const createSelectDestinationTemplate = (destination, checkedType, allDestinations) => {
+  const destinationList = allDestinations.map((option) => (`<option value="${option.name}"></option>`)).join('');
+  return (
+    `<div class="event__field-group  event__field-group--destination">
+      <label class="event__label  event__type-output" for="event-destination-1">
+      ${checkedType.charAt(0).toUpperCase() + checkedType.slice(1)}</label>
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
+      <datalist id="destination-list-1">
+        ${destinationList}
+      </datalist>
+    </div>`
+  );
+};
 
 const createDestinationTemplate = (allDestinations, checkedDestination) => {
   const pointDestinationType = allDestinations.find((destination) => destination.name === checkedDestination);
   if (checkedDestination === '')  {
     return '';
   }
-
   if (pointDestinationType.pictures.length === 0) {
     return '';
   }
@@ -96,9 +99,9 @@ const createDestinationTemplate = (allDestinations, checkedDestination) => {
 };
 
 const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
-  const {basePrice, dateFrom, dateTo, checkedDestination, checkedType, checkedOffers} = point;
 
-  const selectDestinationTemplate = createSelectDestinationTemplate(checkedDestination, checkedType);
+  const {basePrice, dateFrom, dateTo, checkedDestination, checkedType, checkedOffers} = point;
+  const selectDestinationTemplate = createSelectDestinationTemplate(checkedDestination, checkedType,  allDestinations);
   const destinationTemplate = createDestinationTemplate(allDestinations, checkedDestination);
 
 
@@ -115,7 +118,7 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                     <div class="event__type-list">
                       <fieldset class="event__type-group">
                         <legend class="visually-hidden">Event type</legend>
-                        ${createEventsTypeContainer(checkedType)}
+                        ${createEventsTypeContainer(checkedType, allOffers)}
 
                       </fieldset>
                     </div>
@@ -318,7 +321,7 @@ export default class EditPoint extends AbstractStatefulView {
 
   static parsePointToState = (point) => ({...point,
     checkedType: point.type,
-    checkedDestination: point.destination,
+    checkedDestination: point.destination.name,
     checkedOffers: point.offers,
   });
 
@@ -326,7 +329,7 @@ export default class EditPoint extends AbstractStatefulView {
     const point = {...state};
 
     point.type = point.checkedType;
-    point.destination = point.checkedDestination;
+    point.destination.name = point.checkedDestination;
     point.offers = point.checkedOffers;
 
     delete point.checkedType;
