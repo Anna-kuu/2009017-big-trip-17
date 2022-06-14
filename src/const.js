@@ -29,6 +29,7 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export {TYPES, DATE_FROM, DATE_TO, PRICE, DESTINATION, OFFERS_CHOOSE, SortType, FilterType, UserAction, UpdateType};
