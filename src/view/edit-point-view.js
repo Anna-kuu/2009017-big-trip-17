@@ -1,19 +1,20 @@
 import he from 'he';
+import dayjs from 'dayjs';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
-import {today} from '../utils/point.js';
+import {humanizeEventTime} from '../utils/point.js';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANC_POINT = {
   id: null,
   basePrice: '',
-  dateFrom: today,
-  dateTo: today,
+  dateFrom: dayjs(),
+  dateTo: dayjs(),
   destination: {
     description: '',
     name: '',
-    offers: [],
+    pictures: [],
   },
   isFavorite: false,
   offers: [],
@@ -66,7 +67,7 @@ const createSelectDestinationTemplate = (destination, checkedType, allDestinatio
     `<div class="event__field-group  event__field-group--destination">
       <label class="event__label  event__type-output" for="event-destination-1">
       ${checkedType.charAt(0).toUpperCase() + checkedType.slice(1)}</label>
-      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination)}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
+      <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name)}" list="destination-list-1" ${isDisabled ? 'disabled' : ''}>
       <datalist id="destination-list-1">
         ${destinationList}
       </datalist>
@@ -75,8 +76,8 @@ const createSelectDestinationTemplate = (destination, checkedType, allDestinatio
 };
 
 const createDestinationTemplate = (allDestinations, checkedDestination) => {
-  const pointDestinationType = allDestinations.find((destination) => destination.name === checkedDestination);
-  if (checkedDestination === '')  {
+  const pointDestinationType = allDestinations.find((destination) => destination.name === checkedDestination.name);
+  if (checkedDestination.name === '')  {
     return '';
   }
   if (pointDestinationType.pictures.length === 0) {
@@ -102,7 +103,8 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
   const {basePrice, dateFrom, dateTo, checkedDestination, checkedType, checkedOffers, isDisabled, isSaving, isDeleting} = point;
   const selectDestinationTemplate = createSelectDestinationTemplate(checkedDestination, checkedType,  allDestinations);
   const destinationTemplate = createDestinationTemplate(allDestinations, checkedDestination);
-
+  const eventStartTime = humanizeEventTime(dateFrom);
+  const eventEndTime = humanizeEventTime(dateTo);
 
   return (
     `<li class="trip-events__item">
@@ -125,10 +127,10 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                   ${selectDestinationTemplate}
                   <div class="event__field-group  event__field-group--time">
                     <label class="visually-hidden" for="event-start-time-1">From</label>
-                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateFrom}" ${isDisabled ? 'disabled' : ''}>
+                    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${eventStartTime}" ${isDisabled ? 'disabled' : ''}>
                     &mdash;
                     <label class="visually-hidden" for="event-end-time-1">To</label>
-                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateTo}" ${isDisabled ? 'disabled' : ''}>
+                    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${eventEndTime}" ${isDisabled ? 'disabled' : ''}>
                   </div>
                   <div class="event__field-group  event__field-group--price">
                     <label class="event__label" for="event-price-1">
@@ -299,15 +301,16 @@ export default class EditPoint extends AbstractStatefulView {
 
   #changeDestinationHandler = (evt) => {
     evt.preventDefault();
+    const checkedDestination = this.#destinations.find((destination) => destination.name === evt.target.value);
     this.updateElement({
-      checkedDestination: evt.target.value,
+      checkedDestination,
     });
   };
 
   #changePriceHandler = (evt) => {
     evt.preventDefault();
     this._setState({
-      basePrice: evt.target.value,
+      basePrice: Number(evt.target.value),
     });
   };
 
@@ -320,7 +323,7 @@ export default class EditPoint extends AbstractStatefulView {
 
   static parsePointToState = (point) => ({...point,
     checkedType: point.type,
-    checkedDestination: point.destination.name,
+    checkedDestination: point.destination,
     checkedOffers: point.offers,
     isDisabled: false,
     isSaving: false,
@@ -331,7 +334,7 @@ export default class EditPoint extends AbstractStatefulView {
     const point = {...state};
 
     point.type = point.checkedType;
-    point.destination.name = point.checkedDestination;
+    point.destination = point.checkedDestination;
     point.offers = point.checkedOffers;
 
     delete point.checkedType;
