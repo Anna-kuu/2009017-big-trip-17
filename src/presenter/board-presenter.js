@@ -1,8 +1,9 @@
 import SortView from '../view/sort-view.js';
 import TripListView from '../view/list-container-view.js';
+import TripInfoView from '../view/trip-info-view';
 import ListEmptyView from '../view/list-empty-view.js';
 import LoadingView from '../view/loading-view.js';
-import {remove, render} from '../framework/render.js';
+import {remove, render, RenderPosition} from '../framework/render.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 import PointPresenter from './point-presenter.js';
 import PointNewPresenter from './point-new-presenter.js';
@@ -22,17 +23,20 @@ export default class BoardPresenter {
   #loadingComponent = new LoadingView();
   #sortComponent = null;
   #listEmptyComponent = null;
+  #tripInfoComponent = null;
   #pointPresenter = new Map();
   #pointNewPresenter = null;
   #currentSortType = SortType.DEFAULT;
   #filterType = FilterType.EVERYTHING;
   #isLoading = true;
   #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
+  #tripMaimElement = null;
 
-  constructor(boardContainer, pointsModel, filterModel) {
+  constructor(boardContainer, pointsModel, filterModel, tripMainElement) {
     this.#boardContainer = boardContainer;
     this.#pointsModel = pointsModel;
     this.#filterModel = filterModel;
+    this.#tripMaimElement = tripMainElement;
 
     this.#pointNewPresenter = new PointNewPresenter(this.#tripListComponent.element, this.#handleViewAction);
 
@@ -89,7 +93,7 @@ export default class BoardPresenter {
         }
         break;
       case UserAction.ADD_POINT:
-        this.#pointPresenter.get(update.id).setSaving();
+        this.#pointNewPresenter.setSaving();
         try {
           await this.#pointsModel.addPoint(updateType, update);
         } catch(err) {
@@ -160,17 +164,22 @@ export default class BoardPresenter {
     render(this.#listEmptyComponent, this.#boardContainer);
   };
 
+  #renderTripInfo = () => {
+    this.#tripInfoComponent = new TripInfoView(this.points, this.offers);
+    render(this.#tripInfoComponent, this.#tripMaimElement, RenderPosition.AFTERBEGIN);
+  };
+
   #renderBoard = () => {
     if (this.#isLoading) {
       this.#renderLoading();
       return;
     }
 
-    const points = this.points;
-    if (points.length === 0) {
+    if ( this.points.length === 0) {
       this.#renderListEmpty();
       return;
     }
+    this.#renderTripInfo();
     this.#renderSort();
     this.#renderTripList();
   };
@@ -182,6 +191,7 @@ export default class BoardPresenter {
 
     remove(this.#sortComponent);
     remove(this.#loadingComponent);
+    remove(this.#tripInfoComponent);
 
     if (this.#listEmptyComponent) {
       remove(this.#listEmptyComponent);
