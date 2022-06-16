@@ -288,14 +288,14 @@ export default class EditPoint extends AbstractStatefulView {
     evt.preventDefault();
     const oldOffers = this._state.checkedOffers;
     const newOffer = Number(evt.target.parentNode.querySelector('input').id);
-    let checkedOffersArr = [];
+    let updatedOffers = [];
     if (!evt.target.parentNode.querySelector('input').checked) {
-      checkedOffersArr = oldOffers.concat(newOffer);
+      updatedOffers = oldOffers.concat(newOffer);
     } else {
-      checkedOffersArr = oldOffers.filter((element) => element !== newOffer);
+      updatedOffers = oldOffers.filter((element) => element !== newOffer);
     }
     this.updateElement({
-      checkedOffers: checkedOffersArr,
+      checkedOffers: updatedOffers,
     });
   };
 
