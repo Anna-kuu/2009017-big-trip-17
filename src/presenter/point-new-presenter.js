@@ -1,4 +1,4 @@
-import EditPoint from '../view/edit-point-view.js';
+import EditPointView from '../view/edit-point-view.js';
 import {render, remove, RenderPosition} from '../framework/render.js';
 import {UserAction, UpdateType} from '../const.js';
 
@@ -20,7 +20,7 @@ export default class PointNewPresenter {
     if (this.#pointEditComponent !== null) {
       return;
     }
-    this.#pointEditComponent = new EditPoint(offers, destinations);
+    this.#pointEditComponent = new EditPointView(offers, destinations);
     this.#pointEditComponent.setCloseFormClickHandler(this.#handleCloseFormClick);
     this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#pointEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
