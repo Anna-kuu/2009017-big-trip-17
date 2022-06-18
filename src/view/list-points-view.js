@@ -66,7 +66,7 @@ const createEventsTemplate = (point, allOffers) => {
   </li>`);
 };
 
-export default class EventsPoint extends AbstractView {
+export default class ListPointsView extends AbstractView {
   #point = null;
   #offers = null;
 
