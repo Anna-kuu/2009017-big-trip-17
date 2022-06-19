@@ -32,5 +32,9 @@ filterPresenter.init();
 boardPresenter.init();
 pointsModel.init().finally(() => {
   render(newPointButtonComponent, tripMainElement);
+  if (!pointsModel.offers.length || !pointsModel.destinations.length) {
+    newPointButtonComponent.element.disabled = true;
+    return;
+  }
   newPointButtonComponent.setClickHandler(handleNewPointButtonClick);
 });

@@ -175,10 +175,17 @@ export default class BoardPresenter {
       return;
     }
 
-    if ( this.points.length === 0) {
+    if (!this.offers.length || !this.destinations.length) {
+      this.#filterType = FilterType.ERROR;
       this.#renderListEmpty();
       return;
     }
+
+    if (this.points.length === 0) {
+      this.#renderListEmpty();
+      return;
+    }
+
     this.#renderTripInfo();
     this.#renderSort();
     this.#renderTripList();

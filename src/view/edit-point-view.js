@@ -137,7 +137,7 @@ const createEditPointTemplate = (point = {}, allOffers, allDestinations) => {
                       <span class="visually-hidden">Price</span>
                       &euro;
                     </label>
-                    <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}"  ${isDisabled ? 'disabled' : ''}>
+                    <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" min = "1" value="${basePrice}"  ${isDisabled ? 'disabled' : ''}>
                   </div>
                   <button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
                   <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
@@ -287,9 +287,9 @@ export default class EditPointView extends AbstractStatefulView {
   #offersToggleHandler = (evt) => {
     evt.preventDefault();
     const oldOffers = this._state.checkedOffers;
-    const newOffer = Number(evt.target.parentNode.querySelector('input').id);
+    const newOffer = Number(evt.target.id);
     let updatedOffers = [];
-    if (!evt.target.parentNode.querySelector('input').checked) {
+    if (evt.target.checked) {
       updatedOffers = oldOffers.concat(newOffer);
     } else {
       updatedOffers = oldOffers.filter((element) => element !== newOffer);
@@ -309,6 +309,11 @@ export default class EditPointView extends AbstractStatefulView {
 
   #changePriceHandler = (evt) => {
     evt.preventDefault();
+    if (Number(evt.target.value) < 0) {
+      this.updateElement({
+        basePrice: '',
+      });
+    }
     this._setState({
       basePrice: Number(evt.target.value),
     });
@@ -316,7 +321,7 @@ export default class EditPointView extends AbstractStatefulView {
 
   #setInnerHandlers = () => {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#checkedTypeToggleHandler);
-    this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersToggleHandler);
+    this.element.querySelector('.event__available-offers').addEventListener('change', this.#offersToggleHandler);
     this.element.querySelector('.event__input--destination').addEventListener('change', this.#changeDestinationHandler);
     this.element.querySelector('.event__input--price').addEventListener('input', this.#changePriceHandler);
   };

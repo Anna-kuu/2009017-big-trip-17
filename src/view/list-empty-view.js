@@ -5,6 +5,7 @@ const NoPointTextType = {
   [FilterType.EVERYTHING]: 'Click New Event to create your first point',
   [FilterType.PAST]: 'There are no past events now',
   [FilterType.FUTURE]: 'There are no future events now',
+  [FilterType.ERROR]: 'Something went wrong. Try again later.',
 };
 
 const createListEmptyViewTemplate = (filterType) => (
