@@ -5,6 +5,12 @@ import { sortByDay } from '../utils/point.js';
 const createTripInfoTitle = (points) => {
   const startTrip = points[0].destination.name;
   const finishTrip = points[points.length-1].destination.name;
+  if (points.length === 1) {
+    return (`<h1 class="trip-info__title"> ${startTrip} </h1>`);
+  }
+  if (points.length === 2) {
+    return (`<h1 class="trip-info__title"> ${startTrip} &mdash; ${finishTrip} </h1>`);
+  }
   let middleTrip = '...';
   if (points.length === 3) {
     middleTrip = points[1].destination.name;
